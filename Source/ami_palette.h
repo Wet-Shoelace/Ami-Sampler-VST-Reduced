@@ -26,5 +26,6 @@ constexpr uint32_t AMI_BLK = 0xFF000000;
 constexpr uint32_t AMI_GRY = 0xFF9E9E9E;
 constexpr uint32_t AMI_RED = 0xFFC92D28;
 constexpr uint32_t AMI_YLW = 0xFFF9D800;
+constexpr uint32_t AMI_GRN = 0xFF00FF00;
 
 #endif /* __AMI_PALETTE_H */

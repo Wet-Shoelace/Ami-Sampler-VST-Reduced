@@ -30,10 +30,6 @@ public:
     void drawButtonText(juce::Graphics& g, juce::TextButton& button,
         bool /*shouldDrawButtonAsHighlighted*/, bool shouldDrawButtonAsDown) override;
 
-    juce::MouseCursor getMouseCursorFor(juce::Component&) override;
-    juce::MouseCursor getPixelCursor() { return pixelCursor;  }
-    void setMouseCursorSize(const int size);
-
     void drawButtonBackground(juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour,
                               bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
@@ -55,9 +51,6 @@ public:
         [[maybe_unused]] const bool shouldDrawButtonAsHighlighted,
         [[maybe_unused]] const bool shouldDrawButtonAsDown) override;
 private:
-
-    juce::Image mouseCursor;
-    juce::MouseCursor pixelCursor;
     juce::Typeface::Ptr typeface;
     juce::Font pixelFont;
 

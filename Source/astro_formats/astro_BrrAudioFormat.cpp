@@ -480,3 +480,9 @@ juce::AudioFormatWriter* BrrAudioFormat::createWriterFor(juce::OutputStream* /* 
 {
     return nullptr;
 }
+
+std::unique_ptr<juce::AudioFormatWriter> BrrAudioFormat::createWriterFor(std::unique_ptr<juce::OutputStream>& /* streamToWriteTo */,
+                                                                         const juce::AudioFormatWriterOptions& /* options */)
+{
+    return nullptr;
+}

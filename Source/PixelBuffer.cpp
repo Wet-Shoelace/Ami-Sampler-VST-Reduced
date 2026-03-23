@@ -86,7 +86,18 @@ void PixelBuffer::paint (juce::Graphics& g)
 			g.fillRect(loopEndX, 0, 2, getHeight());
 			g.fillRect(loopEndX - 13, getHeight() - 16, 13, 13);
 		}
-	}	
+	}
+
+	if (playStart >= line_start && playStart <= line_end)
+	{
+		playStartX = (int)(point_x.operator[](playStart) * widthRatio);
+		g.setColour(JPAL(AMI_GRN));
+		g.fillRect(playStartX, 0, 2, getHeight());
+
+		const int flagHeight = 8;
+		const int flagY = getHeight() - flagHeight;
+		g.fillRect(playStartX, flagY, 13, flagHeight);
+	}
 }
 
 void PixelBuffer::visibilityChanged()
@@ -114,8 +125,9 @@ void PixelBuffer::mouseDown(const juce::MouseEvent&)
 
 	cursor = mouse_focus = scr2samp(pixel_x);
 
-	if (loopHitBox(loopStartX, mouse_x, mouse_y, true)) loopStartEdit = true;
-	if (loopHitBox(loopEndX, mouse_x, mouse_y, false)) loopEndEdit = true;
+	if (startHitBox(playStartX, mouse_x, mouse_y)) playStartEdit = true;
+	else if (loopHitBox(loopStartX, mouse_x, mouse_y, true)) loopStartEdit = true;
+	else if (loopHitBox(loopEndX, mouse_x, mouse_y, false)) loopEndEdit = true;
 
 	repaint();
 }
@@ -132,13 +144,23 @@ void PixelBuffer::mouseUp(const juce::MouseEvent&)
 		mouse_focus = loopEnd;
 		loopEndEdit = false;
 	}
+	if (playStartEdit)
+	{
+		mouse_focus = playStart;
+		playStartEdit = false;
+	}
 }
 
 void PixelBuffer::mouseDrag(const juce::MouseEvent&)
 {
 	const int mouse_x = getMouseXYRelative().x;
 	
-	if (loopStartEdit)
+	if (playStartEdit)
+	{
+		pixel_x = (int)(mouse_x / widthRatio);
+		setPlayStart(scr2samp(pixel_x));
+	}
+	else if (loopStartEdit)
 	{
 		pixel_x = (int)(mouse_x / widthRatio);
 		loopStart = scr2samp(pixel_x);
@@ -205,6 +227,8 @@ void PixelBuffer::setPixelArea(const int w, const int h)
 
 	pixel_pointer = pixel_buffer.getRawDataPointer();
 	screenBuffer = { juce::Image::PixelFormat::ARGB, PIXEL_WIDTH, PIXEL_HEIGHT, false };
+
+	scroll_bar = { 20, PIXEL_HEIGHT - 1, PIXEL_WIDTH - 7, 11 };
 
 	clearScreen();
 }
@@ -512,8 +536,9 @@ void PixelBuffer::setSampLen(const int len)
 	if (samp_len == 0)
 	{
 		cursor = mouse_focus = line_start = line_end = 0;
+		playStart = 0;
 		scroll_bar.setX(20);
-		scroll_bar.setWidth(398);
+		scroll_bar.setWidth(PIXEL_WIDTH - 7);
 		return;
 	}
 
@@ -525,7 +550,22 @@ void PixelBuffer::setSampLen(const int len)
 	line_start = 0;
 	line_end = wave_width = samp_len;
 
+	setPlayStart(playStart);
 	mouse_focus = samp_len / 2;
+}
+
+void PixelBuffer::setPlayStart(const int pos)
+{
+	if (samp_len <= 0)
+	{
+		playStart = 0;
+		return;
+	}
+
+	playStart = juce::jlimit(0, samp_len - 1, pos);
+
+	if (loopEnable && playStart >= loopEnd)
+		playStart = loopEnd > 0 ? loopEnd - 1 : 0;
 }
 
 int PixelBuffer::draw_new_wave()
@@ -688,6 +728,21 @@ bool PixelBuffer::loopHitBox(const int loopPosX, const int x, const int y, bool 
 	}
 
 	return true;
+}
+
+bool PixelBuffer::startHitBox(const int startPosX, const int x, const int y) const
+{
+	if (samp_len <= 0) return false;
+
+	const int flagWidth = 13;
+	const int flagHeight = 8;
+	const int flagX = startPosX + 1;
+	const int flagY = getHeight() - flagHeight;
+
+	if (x >= startPosX - 3 && x <= startPosX + 3) return true;
+	if (x >= flagX && x <= flagX + flagWidth && y >= flagY && y <= flagY + flagHeight) return true;
+
+	return false;
 }
 
 

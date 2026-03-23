@@ -61,7 +61,6 @@ private:
 
     void initWaveforms(PixelBuffer*);
     void initButton(juce::Button*);
-    void initImgButton(juce::ImageButton*, const juce::Image, const juce::Image);
 
     juce::String getHostName();
 
@@ -76,13 +75,11 @@ private:
     uint32_t scrollcolor = UINT32_MAX;
 
     juce::ImageComponent logoImage;
-    juce::ImageButton clearSampleButton;
 
-    juce::TextButton loadButton{ "LOAD" }, saveButton{ "SAVE" }, 
-                     moreOptions{ "MORE SETTINGS" }, resampleButton{ "RESAMPLE"} ;
+    juce::TextButton moreOptions{ "MORE SETTINGS" }, resampleButton{ "RESAMPLE"} ;
 
-    const juce::Rectangle<int> scrollBack{ 32, 290, 747, 28 };
-    const juce::Rectangle<int> waveBox{ 0, 0, 810, 320 };
+    juce::Rectangle<int> scrollBack;
+    juce::Rectangle<int> waveBox;
 
     bool onScrollBar = false, showAlertWin = false, showExtendedOptions = false;
 

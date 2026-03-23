@@ -8,21 +8,18 @@
 
 #include <JuceHeader.h>
 #include "PluginEditor.h"
+#include "ami_palette.h"
 
 //==============================================================================
 AmiAudioProcessorEditor::AmiAudioProcessorEditor(AmiAudioProcessor& p) : AudioProcessorEditor (&p), audioProcessor(p)
 {
-    const double screen_scale = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay()->scale;
-    const int screen_width = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay()->totalArea.getWidth();
-    
-    const int res_width = (int) std::floor(screen_scale * (double) screen_width);
     juce::Image btn_up, btn_dwn;
     
     setLookAndFeel(&lookNFeel);
     setRepaintsOnMouseActivity(false);
 
     setScaleFactor(audioProcessor.getCurrentScaleFactor());
-    setOpaque(false);
+    setOpaque(true);
 
     amiWindow = std::make_unique<AmiWindowEditor>(audioProcessor);
     amiWindow->setFont(lookNFeel.getCustomFont());
@@ -50,16 +47,7 @@ AmiAudioProcessorEditor::AmiAudioProcessorEditor(AmiAudioProcessor& p) : AudioPr
     setSize (1080, 640);
 
     startTimer(100);
-    amiWindow->setInterceptsMouseClicks(false, true);
-
-    if(res_width >= 3840)
-        lookNFeel.setMouseCursorSize(44);
-    else if(res_width >= 1920)
-        lookNFeel.setMouseCursorSize(33);
-    else if(res_width >= 1280)
-        lookNFeel.setMouseCursorSize(22);
-    else
-        lookNFeel.setMouseCursorSize(11);
+    amiWindow->setInterceptsMouseClicks(true, true);
 }
 
 AmiAudioProcessorEditor::~AmiAudioProcessorEditor()
@@ -67,7 +55,10 @@ AmiAudioProcessorEditor::~AmiAudioProcessorEditor()
     setLookAndFeel(nullptr);
 }
 
-void AmiAudioProcessorEditor::paint (juce::Graphics&) {}
+void AmiAudioProcessorEditor::paint (juce::Graphics& g)
+{
+    g.fillAll(JPAL(AMI_BLU));
+}
 
 void AmiAudioProcessorEditor::resized()
 {
@@ -110,10 +101,23 @@ bool AmiAudioProcessorEditor::isInterestedInFileDrag(const juce::StringArray& fi
         if (file.contains(".wav"))  return true;
         if (file.contains(".aif"))  return true;
         if (file.contains(".aiff")) return true;
+        if (file.contains(".flac")) return true;
+        if (file.contains(".mp3"))  return true;
+        if (file.contains(".ogg"))  return true;
+        if (file.contains(".oga"))  return true;
+        if (file.contains(".opus")) return true;
+        if (file.contains(".ape"))  return true;
+        if (file.contains(".qoa"))  return true;
+        if (file.contains(".aac"))  return true;
+        if (file.contains(".alac")) return true;
+        if (file.contains(".m4a"))  return true;
+        if (file.contains(".mp4"))  return true;
+        if (file.contains(".webm")) return true;
         if (file.contains(".iff"))  return true;
         if (file.contains(".8svx")) return true;
         if (file.contains(".brr"))  return true;
         if (file.contains(".raw"))  return true;
+        if (file.contains(".smp"))  return true;
         if (file.contains(".bin"))  return true;
         if (!file.contains("."))    return true;    // Amiga samples don't typically have a file extension
     }

@@ -15,6 +15,20 @@
 
 #include "AmiSamplerSound.h"
 
+#if JUCE_USE_FFMPEG && defined(__has_include)
+ #if __has_include(<juce_audio_formats/format/juce_FFmpegAudioFormat.h>)
+  #include <juce_audio_formats/format/juce_FFmpegAudioFormat.h>
+  #define AMI_HAS_FFMPEG_AUDIO_FORMAT 1
+ #elif __has_include(<juce_audio_formats/codecs/juce_FFmpegAudioFormat.h>)
+  #include <juce_audio_formats/codecs/juce_FFmpegAudioFormat.h>
+  #define AMI_HAS_FFMPEG_AUDIO_FORMAT 1
+ #else
+  #define AMI_HAS_FFMPEG_AUDIO_FORMAT 0
+ #endif
+#else
+ #define AMI_HAS_FFMPEG_AUDIO_FORMAT 0
+#endif
+
 //==============================================================================
 AmiAudioProcessor::AmiAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -34,6 +48,14 @@ AmiAudioProcessor::AmiAudioProcessor()
     formatManager.registerFormat(new MuLawFormat(), false);
     formatManager.registerFormat(new BrrAudioFormat(), false);
 
+   #if AMI_HAS_FFMPEG_AUDIO_FORMAT
+    formatManager.registerFormat(new juce::FFmpegAudioFormat(), false);
+   #endif
+
+   #if JUCE_MAC
+    formatManager.registerFormat(new juce::CoreAudioFormat(), false);
+   #endif
+
     for(int n = 0; n < NUM_SAMPLERS; n++)
     {
         sampler[n].setNoteStealingEnabled(true);
@@ -44,7 +66,7 @@ AmiAudioProcessor::AmiAudioProcessor()
 
         sampleName[n] = "";
 
-        loopEnable[n] = loopStart[n] = loopEnd[n] = pingpongLoop[n] = 0;
+        loopEnable[n] = loopStart[n] = loopEnd[n] = playStart[n] = pingpongLoop[n] = 0;
         paulaStereo[n] = panCounter[n] = 0;
 
         channelMute[n] = channelSolo[n] = sampleMidiChannel[n] = 0;
@@ -81,6 +103,25 @@ AmiAudioProcessor::~AmiAudioProcessor()
 
     formatManager.clearFormats();
     keyState.removeListener(this);
+}
+
+void AmiAudioProcessor::setPlayStart(const int i, const int start)
+{
+    const juce::String playStartParam = "PLAY START" + juce::String(i);
+    if (init) return;
+
+    int clampedStart = start;
+    const int maxLen = waveForm[i].getNumSamples();
+
+    if (maxLen <= 0)
+        clampedStart = 0;
+    else
+        clampedStart = juce::jlimit(0, maxLen - 1, clampedStart);
+
+    if (loopEnable[i].load() && clampedStart >= loopEnd[i].load())
+        clampedStart = loopEnd[i].load() > 0 ? loopEnd[i].load() - 1 : 0;
+
+    setAVPTSvalue(playStartParam, clampedStart);
 }
 
 //==============================================================================
@@ -468,7 +509,10 @@ void AmiAudioProcessor::buttonLoadFile(std::function<void (const juce::FileChoos
     
     if (myChooser.get() != nullptr) myChooser.reset();
 
-    myChooser = std::make_unique<juce::FileChooser>( "Open File", homeDirectory, "*.wav;*.aif;*.aiff;*.iff;*.8svx;*.raw;*.brr;*.bin;" );
+    myChooser = std::make_unique<juce::FileChooser>( "Open File", homeDirectory,
+        "*.wav;*.aif;*.aiff;*.iff;*.8svx;*.raw;*.smp;*.brr;*.bin;"
+        "*.flac;*.mp3;*.ogg;*.oga;*.opus;*.ape;*.qoa;"
+        "*.aac;*.alac;*.m4a;*.mp4;*.webm;" );
 
     myChooser->launchAsync(flags, callback);
 }
@@ -551,6 +595,8 @@ bool AmiAudioProcessor::loadFile(const juce::String& path)
         setLoopStart(currentSample,fileLoopStart);
         setLoopEnd(currentSample, fileLoopEnd);
     }
+
+    setPlayStart(currentSample, 0);
     
     delete formatReader;
     return true;
@@ -638,6 +684,7 @@ void AmiAudioProcessor::resampleAudioData(const int chan, const double newRate)
                     
     setLoopStart(chan, (int) std::floor((double) loopStart[chan] / resampleRatio));
     setLoopEnd(chan, (int) std::floor((double) loopEnd[chan] / resampleRatio));
+    setPlayStart(chan, (int) std::floor((double) playStart[chan] / resampleRatio));
 
     newSampleData->clear();
 }
@@ -746,6 +793,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmiAudioProcessor::createPar
         parameters.add(createParam("Loop Enable" + sampleParam, 0, 1, 0));
         parameters.add(createParam("Loop Start" + sampleParam, 0, INT32_MAX, 0));
         parameters.add(createParam("Loop End" + sampleParam, 0, INT32_MAX, 0));
+        parameters.add(createParam("Play Start" + sampleParam, 0, INT32_MAX, 0));
 
         parameters.add(createParam("Paula Stereo" + sampleParam, 0, 1, 0));
 
@@ -831,6 +879,7 @@ void AmiAudioProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePrope
         if(changeValueTreeParam(changedParam, "LOOP ENABLE" + sampleParam, paramVal, &loopEnable[n])) return;
         if(changeValueTreeParam(changedParam, "LOOP START" + sampleParam, paramVal, &loopStart[n])) return;
         if(changeValueTreeParam(changedParam, "LOOP END" + sampleParam, paramVal, &loopEnd[n])) return;
+        if(changeValueTreeParam(changedParam, "PLAY START" + sampleParam, paramVal, &playStart[n])) return;
 
         if(changeValueTreeParam(changedParam, "MONO POLY" + sampleParam, paramVal, &numVoices[n])) 
         {

@@ -137,7 +137,17 @@ void AmiSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::Synth
 
         if (releasedNote || numVoices > 1 || audioProcessor.getGlissando(currentSample) <= 1)
         {
-            sourceSamplePosition = 0.0;
+            int startPos = audioProcessor.getPlayStart(currentSample);
+            if (sound->length > 0)
+                startPos = juce::jlimit(0, sound->length - 1, startPos);
+            else
+                startPos = 0;
+
+            if (audioProcessor.getLoopEnable(currentSample) && startPos >= audioProcessor.getLoopEnd(currentSample))
+                startPos = audioProcessor.getLoopEnd(currentSample) > 0 ? audioProcessor.getLoopEnd(currentSample) - 1 : 0;
+
+            sourceSamplePosition = (double) startPos;
+            playForward = true;
 
             pitchRatio = pitchTarget;
             releasedNote = false;

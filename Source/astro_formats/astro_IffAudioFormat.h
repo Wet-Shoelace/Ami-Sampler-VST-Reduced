@@ -63,14 +63,17 @@ public:
                                               unsigned int numberOfChannels,
                                               int bitsPerSample,
                                               const juce::StringPairArray& metadataValues,
-                                              int qualityOptionIndex) override;
+                                              int qualityOptionIndex);
 
     juce::AudioFormatWriter* createWriterFor (juce::OutputStream* streamToWriteTo, double sampleRateToUse,
                                               const juce::AudioChannelSet& channelLayout,
                                               int bitsPerSample,
                                               const juce::StringPairArray& metadataValues,
-                                              int qualityOptionIndex) override;
+                                              int qualityOptionIndex);
     using juce::AudioFormat::createWriterFor;
+
+    std::unique_ptr<juce::AudioFormatWriter> createWriterFor (std::unique_ptr<juce::OutputStream>& streamToWriteTo,
+                                                              const juce::AudioFormatWriterOptions& options) override;
 
     //==============================================================================
     /** Utility function to replace the metadata in a iff file with a new set of values.

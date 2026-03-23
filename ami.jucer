@@ -3,7 +3,7 @@
 <JUCERPROJECT id="xWQlG7" name="Ami Sampler" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               pluginVST3Category="Instrument,Sampler" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginManufacturer="_astriid_" defines="JUCE_MODAL_LOOPS_PERMITTED=0&#10;JUCE_WAV_DO_NOT_PAD_HEADER_SIZE=1"
+              pluginManufacturer="_astriid_" defines="JUCE_MODAL_LOOPS_PERMITTED=0&#10;JUCE_WAV_DO_NOT_PAD_HEADER_SIZE=1&#10;JUCE_USE_FFMPEG=1"
               lv2Uri="https://lv2plug.in/ns/ext/urid/AmiSampler" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="Ijfsy3" name="Ami Sampler">
     <GROUP id="{C7AD4387-7952-6AD4-EE7D-472A6827E160}" name="Res">
@@ -87,6 +87,8 @@
     <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
             useGlobalPath="1"/>
     <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
     <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -115,14 +117,16 @@
         <MODULEPATH id="juce_graphics" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
         <MODULEPATH id="juce_gui_basics" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
         <MODULEPATH id="juce_gui_extra" path="C:\Users\finle\Desktop\JUCE\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="C:/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <VS2022 targetFolder="Builds/VisualStudio2022" smallIcon="scUhL1" bigIcon="scUhL1">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" enablePluginBinaryCopyStep="1" vst3BinaryLocation="C:\Program Files\Common Files\VST3\_astriid_"
-                       targetName="ami"/>
+                       targetName="ami" defines="JUCE_USE_FFMPEG=1"/>
         <CONFIGURATION isDebug="0" name="Release" optimisation="4" targetName="ami"
-                       enablePluginBinaryCopyStep="1" vst3BinaryLocation="C:\Program Files\Common Files\VST3\_astriid_"/>
+                       enablePluginBinaryCopyStep="1" vst3BinaryLocation="C:\Program Files\Common Files\VST3\_astriid_"
+                       defines="JUCE_USE_FFMPEG=1&#10;JUCE_USE_DIRECT2D=0&#10;JUCE_USE_DIRECTWRITE=0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../juce"/>
@@ -137,6 +141,7 @@
         <MODULEPATH id="juce_graphics" path="../../juce"/>
         <MODULEPATH id="juce_gui_basics" path="../../juce"/>
         <MODULEPATH id="juce_gui_extra" path="../../juce"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="C:/JUCE/modules"/>
       </MODULEPATHS>
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="scUhL1" bigIcon="scUhL1">
@@ -157,6 +162,7 @@
         <MODULEPATH id="juce_graphics" path="C:\Dev\clones\JUCE\modules"/>
         <MODULEPATH id="juce_gui_basics" path="C:\Dev\clones\JUCE\modules"/>
         <MODULEPATH id="juce_gui_extra" path="C:\Dev\clones\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="C:/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>

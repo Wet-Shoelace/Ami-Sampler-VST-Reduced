@@ -1,0 +1,102 @@
+Rebuild started at 3:30 AM...
+1>------ Rebuild All started: Project: Ami Sampler_SharedCode, Configuration: Debug x64 ------
+1>  astro_BrrAudioFormat.cpp
+1>  astro_IffAudioFormat.cpp
+1>  astro_MuLawFormat.cpp
+1>  AmiWindowEditor.cpp
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(600,37): warning C4840: non-portable use of class 'juce::AudioFormatWriterOptions' as an argument to a variadic function
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(600,37):
+1>      'juce::AudioFormatWriterOptions::AudioFormatWriterOptions' is non-trivial
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(600,37):
+1>      the constructor and destructor will not be called; a bitwise copy of the class will be passed as the argument
+1>      C:\JUCE\modules\juce_audio_formats\format\juce_AudioFormatWriterOptions.h(46,16):
+1>      see declaration of 'juce::AudioFormatWriterOptions'
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(601,39): warning C4840: non-portable use of class 'juce::AudioFormatWriterOptions' as an argument to a variadic function
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(601,39):
+1>      'juce::AudioFormatWriterOptions::AudioFormatWriterOptions' is non-trivial
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(601,39):
+1>      the constructor and destructor will not be called; a bitwise copy of the class will be passed as the argument
+1>      C:\JUCE\modules\juce_audio_formats\format\juce_AudioFormatWriterOptions.h(46,16):
+1>      see declaration of 'juce::AudioFormatWriterOptions'
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(602,43): warning C4840: non-portable use of class 'juce::AudioFormatWriterOptions' as an argument to a variadic function
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(602,43):
+1>      'juce::AudioFormatWriterOptions::AudioFormatWriterOptions' is non-trivial
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(602,43):
+1>      the constructor and destructor will not be called; a bitwise copy of the class will be passed as the argument
+1>      C:\JUCE\modules\juce_audio_formats\format\juce_AudioFormatWriterOptions.h(46,16):
+1>      see declaration of 'juce::AudioFormatWriterOptions'
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(603,39): warning C4840: non-portable use of class 'juce::AudioFormatWriterOptions' as an argument to a variadic function
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(603,39):
+1>      'juce::AudioFormatWriterOptions::AudioFormatWriterOptions' is non-trivial
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(603,39):
+1>      the constructor and destructor will not be called; a bitwise copy of the class will be passed as the argument
+1>      C:\JUCE\modules\juce_audio_formats\format\juce_AudioFormatWriterOptions.h(46,16):
+1>      see declaration of 'juce::AudioFormatWriterOptions'
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(604,42): warning C4840: non-portable use of class 'juce::AudioFormatWriterOptions' as an argument to a variadic function
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(604,42):
+1>      'juce::AudioFormatWriterOptions::AudioFormatWriterOptions' is non-trivial
+1>      \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\astro_formats\astro_IffAudioFormat.cpp(604,42):
+1>      the constructor and destructor will not be called; a bitwise copy of the class will be passed as the argument
+1>      C:\JUCE\modules\juce_audio_formats\format\juce_AudioFormatWriterOptions.h(46,16):
+1>      see declaration of 'juce::AudioFormatWriterOptions'
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\TrackerKeyboardComponent.h(22,5): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>  (compiling source file '../../Source/AmiWindowEditor.cpp')
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\AmiWindowEditor.cpp(26,1): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>  AmiAlertWindow.cpp
+1>  ami_font.cpp
+1>  GuiComponent.cpp
+1>  AmiLookAndFeel.cpp
+1>  AmiSamplerSound.cpp
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(448,16): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\AmiLookAndFeel.cpp(28,1): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\AmiLookAndFeel.cpp(30,27): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(582,58): warning C4244: '=': conversion from '_Ty' to 'int', possible loss of data
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(582,58): warning C4244:         with
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(582,58): warning C4244:         [
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(582,58): warning C4244:             _Ty=double
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(582,58): warning C4244:         ]
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(589,54): warning C4244: '=': conversion from '_Ty' to 'int', possible loss of data
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(589,54): warning C4244:         with
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(589,54): warning C4244:         [
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(589,54): warning C4244:             _Ty=double
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\GuiComponent.cpp(589,54): warning C4244:         ]
+1>  PixelBuffer.cpp
+1>  PluginEditor.cpp
+1>  PluginProcessor.cpp
+1>  RCFilters.cpp
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\TrackerKeyboardComponent.h(22,5): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>  (compiling source file '../../Source/PluginEditor.cpp')
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\TrackerKeyboardComponent.h(22,5): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>  (compiling source file '../../Source/PluginProcessor.cpp')
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\PluginProcessor.cpp(429,32): warning C4996: 'juce::AudioFormat::createWriterFor': Use the function taking an AudioFormatWriterOptions instead.
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\PluginProcessor.cpp(465,32): warning C4996: 'juce::AudioFormat::createWriterFor': Use the function taking an AudioFormatWriterOptions instead.
+1>  SliderComponent.cpp
+1>  BinaryData.cpp
+1>  include_juce_audio_basics.cpp
+1>  include_juce_audio_devices.cpp
+1>  include_juce_audio_formats.cpp
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\SliderComponent.cpp(181,16): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>\\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Source\SliderComponent.cpp(213,16): warning C4996: 'juce::Font::Font': Use the constructor that takes a FontOptions argument
+1>  include_juce_audio_plugin_client_ARA.cpp
+1>  include_juce_audio_processors_ara.cpp
+1>  include_juce_audio_processors_headless_ara.cpp
+1>  include_juce_audio_processors_headless_lv2_libs.cpp
+1>  include_juce_audio_processors_lv2_libs.cpp
+1>  include_juce_audio_utils.cpp
+1>  include_juce_core_CompilationTime.cpp
+1>  include_juce_data_structures.cpp
+1>  include_juce_events.cpp
+1>  include_juce_graphics_Harfbuzz.cpp
+1>  include_juce_gui_extra.cpp
+1>  include_juce_audio_processors.cpp
+1>  include_juce_audio_processors_headless.cpp
+1>  include_juce_core.cpp
+1>  include_juce_graphics.cpp
+1>  include_juce_gui_basics.cpp
+1>  include_juce_graphics_Sheenbidi.c
+1>  Ami Sampler_SharedCode.vcxproj -> \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Builds\VisualStudio2022\x64\Debug\Shared Code\ami.lib
+2>------ Rebuild All started: Project: Ami Sampler_StandalonePlugin, Configuration: Debug x64 ------
+2>  include_juce_audio_plugin_client_Standalone.cpp
+2>  Ami Sampler_StandalonePlugin.vcxproj -> \\host.lan\Data\Documents\_src\Ami-Sampler-VST-Reduced\Builds\VisualStudio2022\x64\Debug\Standalone Plugin\ami.exe
+========== Rebuild All: 2 succeeded, 0 failed, 0 skipped ==========
+========== Rebuild completed at 3:31 AM and took 01:02.961 minutes ==========

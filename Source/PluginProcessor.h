@@ -115,6 +115,9 @@ public:
     std::atomic<int>& getLoopStart(const int i) { return loopStart[i]; }
     std::atomic<int>& getLoopEnd(const int i) { return loopEnd[i]; }
 
+    void setPlayStart(const int i, const int start);
+    std::atomic<int>& getPlayStart(const int i) { return playStart[i]; }
+
     std::atomic<int>& getSamplePos() { return samplePos; }
     void setSamplePos(const int pos) { samplePos = pos; }
 
@@ -338,7 +341,8 @@ private:
 
     std::atomic<int> sampleMidiChannel[NUM_SAMPLERS], midiRootNote[NUM_SAMPLERS], midiLowNote[NUM_SAMPLERS], midiHiNote[NUM_SAMPLERS];
 
-    std::atomic<int> loopStart[NUM_SAMPLERS], loopEnd[NUM_SAMPLERS], loopEnable[NUM_SAMPLERS], snh[NUM_SAMPLERS], pingpongLoop[NUM_SAMPLERS];
+    std::atomic<int> loopStart[NUM_SAMPLERS], loopEnd[NUM_SAMPLERS], loopEnable[NUM_SAMPLERS], playStart[NUM_SAMPLERS],
+                     snh[NUM_SAMPLERS], pingpongLoop[NUM_SAMPLERS];
 
     std::atomic<double> sourceSampleRate[NUM_SAMPLERS], resampleRate[NUM_SAMPLERS];
 

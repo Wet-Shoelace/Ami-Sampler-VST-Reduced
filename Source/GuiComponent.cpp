@@ -16,7 +16,7 @@
 //==============================================================================
 GuiComponent::GuiComponent(AmiAudioProcessor& p) : handleSliders(p), audioProcessor(p)
 {
-    setInterceptsMouseClicks(false, false);
+    setInterceptsMouseClicks(true, true);
     setRepaintsOnMouseActivity(false);
 
     addAndMakeVisible(handleSliders);

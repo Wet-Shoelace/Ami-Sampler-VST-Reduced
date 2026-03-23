@@ -28,9 +28,6 @@ AmiLookAndFeel::AmiLookAndFeel()
 {
     typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::amidos_ttf, BinaryData::amidos_ttfSize);
     pixelFont = juce::Font(typeface);
-
-    mouseCursor = juce::Image(juce::ImageCache::getFromMemory(BinaryData::amiMouseCursor_png, BinaryData::amiMouseCursor_pngSize));
-    pixelCursor = juce::MouseCursor(mouseCursor.rescaled(33,33, juce::Graphics::lowResamplingQuality), 1, 1);
 }
 
 AmiLookAndFeel::~AmiLookAndFeel()
@@ -53,17 +50,6 @@ juce::Font AmiLookAndFeel::getLabelFont(juce::Label& label)
 
     pixelFont.setHeight(height);
     return pixelFont;
-}
-
-juce::MouseCursor AmiLookAndFeel::getMouseCursorFor(juce::Component&)
-{
-    return pixelCursor;
-}
-
-void AmiLookAndFeel::setMouseCursorSize(const int size)
-{
-    jassert(size > 0);
-    pixelCursor = juce::MouseCursor(mouseCursor.rescaled(size, size, juce::Graphics::lowResamplingQuality), 0, 0);
 }
 
 juce::Font AmiLookAndFeel::getTextButtonFont(juce::TextButton& button, int buttonHeight)

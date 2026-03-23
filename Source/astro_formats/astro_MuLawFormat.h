@@ -43,9 +43,12 @@ public:
                                              unsigned int numberOfChannels,
                                              int bitsPerSample,
                                              const juce::StringPairArray& metadataValues,
-                                             int qualityOptionIndex) override;
+                                             int qualityOptionIndex);
 
     using AudioFormat::createWriterFor;
+
+    std::unique_ptr<juce::AudioFormatWriter> createWriterFor(std::unique_ptr<juce::OutputStream>& streamToWriteTo,
+                                                             const juce::AudioFormatWriterOptions& options) override;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MuLawFormat)

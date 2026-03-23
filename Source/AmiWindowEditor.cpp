@@ -13,12 +13,18 @@
 
 #include "ami_palette.h"
 
+namespace
+{
+    constexpr float kWaveMenuRatio = 0.2f;
+    constexpr float kWaveAreaRatio = 1.0f - kWaveMenuRatio;
+}
+
 //==============================================================================
 AmiWindowEditor::AmiWindowEditor (AmiAudioProcessor& p)
     : handleGui(p), keyboardComponent(p.getKeyState(), juce::MidiKeyboardComponent::horizontalKeyboard),
       audioProcessor (p)
 {
-    juce::Image btn_up, btn_dwn, logo;
+    juce::Image logo;
 
     addAndMakeVisible(handleGui);
     handleGui.setInterceptsMouseClicks(false, true);
@@ -47,22 +53,10 @@ AmiWindowEditor::AmiWindowEditor (AmiAudioProcessor& p)
 
     addAndMakeVisible(waveMenu.get());
 
-    initButton(&loadButton);
-    initButton(&saveButton);
-
     initButton(&moreOptions);
     initButton(&resampleButton);
 
     resampleButton.setVisible(false);
-
-    btn_up = juce::ImageCache::getFromMemory(BinaryData::amiTrashOff_png, BinaryData::amiTrashOff_pngSize);
-    btn_dwn = juce::ImageCache::getFromMemory(BinaryData::amiTrashOn_png, BinaryData::amiTrashOn_pngSize);
-    
-    jassert(!btn_up.isNull());
-    jassert(!btn_dwn.isNull());
-
-    initImgButton(&clearSampleButton, btn_up.rescaled(60, 66, juce::Graphics::lowResamplingQuality),
-        btn_dwn.rescaled(60, 66, juce::Graphics::lowResamplingQuality));
     
     logo = juce::ImageCache::getFromMemory(BinaryData::astriid_amiga_png, BinaryData::astriid_amiga_pngSize);
 
@@ -72,7 +66,6 @@ AmiWindowEditor::AmiWindowEditor (AmiAudioProcessor& p)
 
     keyboardComponent.clearKeyMappings();
     keyboardComponent.setAvailableRange(36, 108);
-    keyboardComponent.setMouseCursor(getMouseCursor());
 
     keyboardComponent.setKeyWidth(21);
     keyboardComponent.setBlackNoteLengthProportion(0.66f);
@@ -82,6 +75,7 @@ AmiWindowEditor::AmiWindowEditor (AmiAudioProcessor& p)
     keyboardComponent.setColour(juce::MidiKeyboardComponent::shadowColourId, JPAL(AMI_BLK));
     keyboardComponent.setColour(juce::MidiKeyboardComponent::keyDownOverlayColourId, JPAL(AMI_WHT));
 
+    setOpaque(true);
     setWantsKeyboardFocus(true);
     setRepaintsOnMouseActivity(false);
 
@@ -142,8 +136,14 @@ void AmiWindowEditor::paint (juce::Graphics& g)
         repaint(waveBox);
     }
 
+    if (waveform[currentSample]->getNewPlayStart() != audioProcessor.getPlayStart(currentSample))
+    {
+        waveform[currentSample]->setPlayStart(audioProcessor.getPlayStart(currentSample));
+        repaint(waveBox);
+    }
+
     g.setColour(JPAL(AMI_GRY - 0x00606060));
-    g.fillRect(proportionOfWidth(0.75f), 0, proportionOfWidth(0.25f), 2);
+    g.fillRect(proportionOfWidth(kWaveAreaRatio), 0, proportionOfWidth(kWaveMenuRatio), 2);
 
     g.setColour(JPAL(AMI_BLD));
     g.fillRect(proportionOfWidth(0.88f), getHeight() - 2, proportionOfWidth(0.12f), 2);
@@ -254,27 +254,32 @@ void AmiWindowEditor::paintOverChildren(juce::Graphics& g)
 
 void AmiWindowEditor::resized()
 {
-    const float wave_x = 15.f / (float)proportionOfWidth(0.5), 
-                wave_y = 15.f / (float)proportionOfHeight(0.5),
-                wave_w = 0.75f - (wave_x * 2), wave_h = 0.5f - (wave_y * 2);
+    const float wave_x = 15.f / (float)getWidth();
+    const float wave_y = 15.f / (float)getHeight();
+    const float wave_w = kWaveAreaRatio - (wave_x * 2);
+    const float wave_h = 0.5f - (wave_y * 2);
 
     handleGui.setBoundsRelative(0.f, 0.f, 1.f, 1.f);
     
     for(int i = 0; i < numWaveforms; i++)
         waveform[i]->setBoundsRelative(wave_x, wave_y, wave_w, wave_h);
 
-    waveMenu->setBoundsRelative(0.75f, 0.f, 0.25f, 0.5f);
-
-    clearSampleButton.setBoundsRelative(0.875f, 0.85f, 0.13f, 0.14f);
-
-    loadButton.setBoundsRelative(0.89f, 0.737f, 0.1f, 0.051f);
-    saveButton.setBoundsRelative(0.89f, 0.785f, 0.1f, 0.051f);
+    waveMenu->setBoundsRelative(kWaveAreaRatio, 0.f, kWaveMenuRatio, 0.5f);
     
     moreOptions.setBoundsRelative(0.72f, 0.785f, 0.15f, 0.051f);
     resampleButton.setBoundsRelative(0.7f, 0.663f, 0.1f, 0.051f);
 
     keyboardComponent.setBoundsRelative(0.021f, 0.86f, 0.838f, 0.13f);
     logoImage.setBoundsRelative(0.69f, 0.52f, 0.3f, 0.08f);
+
+    waveBox = { 0, 0, proportionOfWidth(kWaveAreaRatio), proportionOfHeight(0.5f) };
+
+    if (waveform[0] != nullptr)
+    {
+        const auto waveBounds = waveform[0]->getBounds();
+        const int scrollHeight = juce::roundToInt(getHeight() * (28.0f / 640.0f));
+        scrollBack = { waveBounds.getX() + 2, waveBounds.getBottom(), waveBounds.getWidth() - 4, scrollHeight };
+    }
 }
 
 void AmiWindowEditor::visibilityChanged()
@@ -378,39 +383,6 @@ bool AmiWindowEditor::keyPressed(const juce::KeyPress& k)
 
     if(!showAlertWin) keyboardComponent.grabKeyboardFocus();
     
-    if (juce::JUCEApplicationBase::isStandaloneApp())
-    {
-        if ((juce::SystemStats::getOperatingSystemType() & juce::SystemStats::MacOSX) == 0)
-        {
-            if (k.getTextDescription().compareIgnoreCase("ctrl + O") == 0)
-            {
-                loadButton.triggerClick();
-                return true;
-            }
-
-            if (k.getTextDescription().compareIgnoreCase("ctrl + S") == 0)
-            {
-                saveButton.triggerClick();
-                return true;
-            }
-        }
-
-        else if ((juce::SystemStats::getOperatingSystemType() & juce::SystemStats::MacOSX) != 0)
-        {
-            if (k.getTextDescription().compareIgnoreCase("command + O") == 0)
-            {
-                loadButton.triggerClick();
-                return true;
-            }
-
-            if (k.getTextDescription().compareIgnoreCase("command + S") == 0)
-            {
-                saveButton.triggerClick();
-                return true;
-            }
-        }
-    }
-
     if (switchWaveforms(k)) return true;
 
     if (cycleWaveforms(k.getKeyCode())) return true;
@@ -527,6 +499,7 @@ void AmiWindowEditor::loadWaves()
     waveform[currentSample]->setLoopEnable(audioProcessor.getLoopEnable(currentSample));
     waveform[currentSample]->setLoopStart(audioProcessor.getLoopStart(currentSample));
     waveform[currentSample]->setLoopEnd(audioProcessor.getLoopEnd(currentSample));
+    waveform[currentSample]->setPlayStart(audioProcessor.getPlayStart(currentSample));
 
     waveform[currentSample]->draw_new_wave();
     waveform[currentSample]->updateWaveform();
@@ -592,126 +565,6 @@ void AmiWindowEditor::timerCallback()
 
 void AmiWindowEditor::buttonClicked(juce::Button* button)
 {
-    if(button == &clearSampleButton)
-    {
-        juce::AudioProcessorValueTreeState* APVTS = &audioProcessor.getAPVTS();
-     
-        audioProcessor.getSampler(currentSample).clearSounds();
-        audioProcessor.getWaveForm(currentSample).setSize(1, 0);
-        audioProcessor.getWaveForm(currentSample).clear();
-
-        APVTS->state.setProperty("pathname" + juce::String(currentSample), "", nullptr);
-        APVTS->state.setProperty("waveformdata" + juce::String(currentSample), "", nullptr);
-        APVTS->state.setProperty("samplename" + juce::String(currentSample), "", nullptr);
-
-        waveform[currentSample]->setSampLen(0);
-        waveform[currentSample]->allocatePoints(0);
-        waveform[currentSample]->clearScreen();
-        waveform[currentSample]->copyPixelBuffer();
-
-        audioProcessor.setLoopEnable(currentSample, 0);
-        audioProcessor.setLoopStart(currentSample, 0);
-        audioProcessor.setLoopEnd(currentSample, 0);
-
-        waveform[currentSample]->setLoopEnable(audioProcessor.getLoopEnable(currentSample));
-        waveform[currentSample]->setLoopStart(audioProcessor.getLoopStart(currentSample));
-        waveform[currentSample]->setLoopEnd(audioProcessor.getLoopEnd(currentSample));
-
-        audioProcessor.setSampleName(currentSample, "");
-        drawWaveMenu();
-        waveMenu->copyPixelBuffer();
-
-        repaint(getBounds().withHeight(proportionOfHeight(0.5f)));
-    }
-
-    if (button == &loadButton)
-    {
-        if(audioProcessor.isHostPlaying())
-        {
-            juce::String hostName = getHostName();
-            
-            alertWinTitle  = hostName + " Is Playing";
-            alertWinMesage = "Cannot load sample while\nhost (" + hostName + ") is playing.";
-
-            showAlertWin = true;
-
-            return;
-        }
-
-        std::function<void (const juce::FileChooser&)> callback = [&](const juce::FileChooser& asyncChooser) 
-        { 
-            juce::File file = asyncChooser.getResult();
-
-            loadButton.setColour(juce::TextButton::buttonColourId, JPAL(AMI_GRY));
-            loadButton.setColour(juce::TextButton::textColourOffId, JPAL(AMI_BLK));
-
-            if(file.getFileName().isEmpty()) return;
-            
-            if (file.hasFileExtension("wav") || file.hasFileExtension("aif") || file.hasFileExtension("aiff") || file.hasFileExtension("bin") ||
-                file.hasFileExtension("brr") || file.hasFileExtension("iff") || file.hasFileExtension("raw")  || file.hasFileExtension("smp") ||
-                !file.getFileName().contains("."))
-            {
-                handleLoad(file);
-            }
-            else
-            {
-                alertWinTitle  = "Invalid Audio File";
-                alertWinMesage = "Please select valid\nAudio File.";
-
-                showAlertWin = true;
-            }
-        };
-
-        loadButton.setColour(juce::TextButton::buttonColourId, JPAL(AMI_RED));
-        loadButton.setColour(juce::TextButton::textColourOffId, JPAL(AMI_WHT));
-
-        audioProcessor.buttonLoadFile(callback);
-    }
-
-    if (button == &saveButton)
-    {
-        if(audioProcessor.isHostPlaying())
-        {
-            juce::String hostName = getHostName();
-
-            alertWinTitle  = hostName + " Is Playing";
-            alertWinMesage = "Cannot save sample while\nhost (" + hostName + ") is playing.";
-
-            showAlertWin = true;
-
-            return;
-        }
-
-        saveButton.setColour(juce::TextButton::buttonColourId, JPAL(AMI_RED));
-        saveButton.setColour(juce::TextButton::textColourOffId, JPAL(AMI_WHT));
-
-        if(audioProcessor.getWaveForm(currentSample).getNumSamples() > 0)
-        {
-            std::function<void (const juce::FileChooser&)> callback = [this](const juce::FileChooser& asyncChooser) 
-            {
-                juce::File file = asyncChooser.getResult();
-                
-                if(!audioProcessor.saveFile(file))
-                {
-                    alertWinTitle  = "File Not Saved";
-                    alertWinMesage = "Error while saving\n" + file.getFileName();
-
-                    showAlertWin = true;
-                }
-
-                saveButton.setColour(juce::TextButton::buttonColourId, JPAL(AMI_GRY));
-                saveButton.setColour(juce::TextButton::textColourOffId, JPAL(AMI_BLK));
-            };
-            
-            audioProcessor.saveFileButton(audioProcessor.getSampleName(currentSample) + ".wav", callback);
-        }
-        else
-        {
-            saveButton.setColour(juce::TextButton::buttonColourId, JPAL(AMI_GRY));
-            saveButton.setColour(juce::TextButton::textColourOffId, JPAL(AMI_BLK));
-        }
-    }
-    
     if(button == &moreOptions)
     {
         audioProcessor.switchOptions();
@@ -810,7 +663,13 @@ bool AmiWindowEditor::switchWaveforms(const juce::KeyPress& k)
 
 void AmiWindowEditor::checkLoops()
 {
-    int newLoopStart = 0, newLoopEnd = 0;
+    int newLoopStart = 0, newLoopEnd = 0, newPlayStart = 0;
+
+    if ((newPlayStart = waveform[currentSample]->getNewPlayStart()) != audioProcessor.getPlayStart(currentSample))
+    {
+        audioProcessor.setPlayStart(currentSample, newPlayStart);
+        repaint(waveBox);
+    }
 
     if (!audioProcessor.getLoopEnable(currentSample)) return;
 
@@ -823,13 +682,15 @@ void AmiWindowEditor::checkLoops()
     if ((newLoopEnd = waveform[currentSample]->getNewLoopEnd()) != audioProcessor.getLoopEnd(currentSample))
     {
         audioProcessor.setLoopEnd(currentSample, newLoopEnd);
+        if (audioProcessor.getPlayStart(currentSample) >= newLoopEnd)
+            audioProcessor.setPlayStart(currentSample, newLoopEnd > 0 ? newLoopEnd - 1 : 0);
         repaint(waveBox);
     }
 }
 
 void AmiWindowEditor::initWaveforms(PixelBuffer* w)
 {
-    w->setPixelArea(405, 160);
+    w->setPixelArea(432, 160);
     w->resetZoom();
 
     if (audioProcessor.getWaveForm(currentSample).getNumSamples() > 0)
@@ -846,14 +707,6 @@ void AmiWindowEditor::initButton(juce::Button* b)
     addAndMakeVisible(*b);
     b->setColour(juce::TextButton::buttonColourId, JPAL(AMI_GRY));
     b->setColour(juce::TextButton::textColourOffId, JPAL(AMI_BLK));
-}
-
-void AmiWindowEditor::initImgButton(juce::ImageButton* b, const juce::Image up, const juce::Image down)
-{
-    b->addListener(this);
-    addAndMakeVisible(*b);
-
-    b->setImages(true, true, true, up, 1.0f, JPAL(0), up, 1.0, JPAL(0), down, 1.0f, JPAL(0), 0.0f);
 }
 
 static juce::String getSimplifiedHostDecription(juce::PluginHostType& type) noexcept

@@ -239,3 +239,17 @@ juce::AudioFormatWriter* MuLawFormat::createWriterFor(juce::OutputStream* out, d
 
     return nullptr;
 }
+
+std::unique_ptr<juce::AudioFormatWriter> MuLawFormat::createWriterFor(std::unique_ptr<juce::OutputStream>& streamToWriteTo,
+                                                                      const juce::AudioFormatWriterOptions& /* options */)
+{
+    if (streamToWriteTo == nullptr)
+        return nullptr;
+
+    auto* rawStream = streamToWriteTo.release();
+    if (auto* writer = createWriterFor(rawStream))
+        return std::unique_ptr<juce::AudioFormatWriter>(writer);
+
+    streamToWriteTo.reset(rawStream);
+    return nullptr;
+}

@@ -567,4 +567,59 @@ juce::AudioFormatWriter* IffAudioFormat::createWriterFor (juce::OutputStream* ou
 
     return nullptr;
 }
+
+namespace
+{
+    template <typename Options>
+    auto getSampleRate(const Options& opts, int) -> decltype(opts.sampleRate) { return opts.sampleRate; }
+    inline double getSampleRate(...) { return 0.0; }
+
+    template <typename Options>
+    auto getNumChannels(const Options& opts, int) -> decltype(opts.numChannels) { return opts.numChannels; }
+    inline int getNumChannels(...) { return 0; }
+
+    template <typename Options>
+    auto getBitsPerSample(const Options& opts, int) -> decltype(opts.bitsPerSample) { return opts.bitsPerSample; }
+    inline int getBitsPerSample(...) { return 0; }
+
+    template <typename Options>
+    auto getMetadata(const Options& opts, int) -> decltype(opts.metadataValues) { return opts.metadataValues; }
+    inline juce::StringPairArray getMetadata(...) { return {}; }
+
+    template <typename Options>
+    auto getQuality(const Options& opts, int) -> decltype(opts.quality) { return opts.quality; }
+    inline int getQuality(...) { return 0; }
+}
+
+std::unique_ptr<juce::AudioFormatWriter> IffAudioFormat::createWriterFor (std::unique_ptr<juce::OutputStream>& streamToWriteTo,
+                                                                          const juce::AudioFormatWriterOptions& options)
+{
+    if (streamToWriteTo == nullptr)
+        return nullptr;
+
+    auto sampleRate = getSampleRate(options, 0);
+    auto numChannels = getNumChannels(options, 0);
+    auto bitsPerSample = getBitsPerSample(options, 0);
+    auto metadataValues = getMetadata(options, 0);
+    auto qualityOptionIndex = getQuality(options, 0);
+
+    if (sampleRate <= 0.0)
+        sampleRate = 8363.0;
+
+    if (numChannels <= 0)
+        numChannels = 1;
+
+    if (bitsPerSample <= 0)
+        bitsPerSample = 8;
+
+    auto channelLayout = IffFileHelpers::canonicalWavChannelSet(numChannels);
+
+    auto* rawStream = streamToWriteTo.release();
+    if (auto* writer = createWriterFor(rawStream, sampleRate, channelLayout,
+                                       bitsPerSample, metadataValues, qualityOptionIndex))
+        return std::unique_ptr<juce::AudioFormatWriter>(writer);
+
+    streamToWriteTo.reset(rawStream);
+    return nullptr;
+}
 //==============================================================================

@@ -75,9 +75,11 @@ public:
     inline void setLoopEnable(const bool enable) { loopEnable = enable; }
     inline void setLoopStart(const int pos) { loopStart = pos; }
     inline void setLoopEnd(const int pos) { loopEnd = pos; }
+    void setPlayStart(const int pos);
     
     inline int& getNewLoopStart() { return loopStart; }
     inline int& getNewLoopEnd() { return loopEnd; }
+    inline int& getNewPlayStart() { return playStart; }
 
     inline int& getPixelMouseX() { return pixel_x; }
     inline int& getPixelMouseY() { return pixel_y; }
@@ -102,6 +104,7 @@ private:
     void drawWaveLines();
     void drawWavePolygons();
     bool loopHitBox(const int loopPosX, const int x, const int y, bool startPos) const;
+    bool startHitBox(const int startPosX, const int x, const int y) const;
 
     juce::Image screenBuffer = { juce::Image::PixelFormat::ARGB, 1, 1, false };
 
@@ -121,16 +124,16 @@ private:
     uint32_t zoom_timer = 0;
 
     int samp_len = 0, sample_pos = 0, 
-        loopStart = 0, loopEnd = 0,
-        loopStartX = 0, loopEndX = 0;
+        loopStart = 0, loopEnd = 0, playStart = 0,
+        loopStartX = 0, loopEndX = 0, playStartX = 0;
 
     bool loopEnable = false;
 
     float widthRatio = 0;
 
-    bool loopStartEdit = false, loopEndEdit = false;
+    bool loopStartEdit = false, loopEndEdit = false, playStartEdit = false;
 
-    juce::Rectangle<int> scroll_bar{ 20, 159, 398, 11 };
+    juce::Rectangle<int> scroll_bar{ 0, 0, 0, 0 };
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PixelBuffer)
 };
